@@ -1,2 +1,2 @@
 # SKYtextUtils
-Enter your text and let Text Utils do the magic....
+used Python, Django, HTML, CSS.
