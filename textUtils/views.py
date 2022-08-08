@@ -8,15 +8,13 @@ def index(request):
 
 def analyze(request):
     # get the text
-    djText= request.GET.get('text', 'default')
+    djText= request.POST.get('text', 'default')
 
     # check checkbox values
-    removePunc= request.GET.get('removePunc', 'off')
-    fullCaps= request.GET.get('fullCaps', 'off')
-    newLineRemover= request.GET.get('newLineRemover', 'off')
-    extraSpaceRemover= request.GET.get('extraSpaceRemover', 'off')
-    charCounter= request.GET.get('charCounter', 'off')
-
+    removePunc= request.POST.get('removePunc', 'off')
+    fullCaps= request.POST.get('fullCaps', 'off')
+    newLineRemover= request.POST.get('newLineRemover', 'off')
+    extraSpaceRemover= request.POST.get('extraSpaceRemover', 'off')
 
     # check which checkbox is ON
     if removePunc== "on":
@@ -26,38 +24,32 @@ def analyze(request):
             if char not in punctuations:
                 analyzed= analyzed+ char
         dict= {'purpose': 'Remove Punctuations', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', dict)
+        djText= analyzed
 
-    elif fullCaps== "on":
+    if fullCaps== "on":
         analyzed= ""
         for char in djText:
             analyzed= analyzed + char.upper()
         dict = {'purpose': 'Changed to UPPERCASE', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', dict)
+        djText= analyzed
 
-    elif newLineRemover== "on":
+    if newLineRemover== "on":
         analyzed = ""
         for char in djText:
-            if char!= "\n":
+            if char != "\n" and char != "\r":
                 analyzed = analyzed + char
         dict = {'purpose': 'Removed New Lines', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', dict)
+        djText= analyzed
 
-    elif extraSpaceRemover== "on":
+    if extraSpaceRemover== "on":
         analyzed = ""
-        for index, char in enumerate(djText):
-            if not(djText[index]==" " and djText[index+1]==" "):
+        for index,char in enumerate(djText):
+            if not(djText[index] == " " and djText[index+1] == " "):
                 analyzed = analyzed + char
         dict = {'purpose': 'Remove Extra Spaces', 'analyzed_text': analyzed}
         return render(request, 'analyze.html', dict)
 
+    if removePunc!= "on" and fullCaps!= "on" and newLineRemover != "on" and extraSpaceRemover != "on":
+        return HttpResponse("Please Select Any Operation and Try Again!")
 
-    elif charCounter== "on":
-        analyzed= ('Number of character is', len(djText))
-        dict = {'purpose': 'Count the Characters', 'analyzed_text': analyzed}
-        return render(request, 'analyze.html', dict)
-
-
-
-    else:
-        return HttpResponse("Error")
+    return render(request, 'analyze.html', dict)
